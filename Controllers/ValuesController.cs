@@ -3,6 +3,11 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
+using System.Drawing;
+using System.IO;
+using System.Net.Http;
+using System.Net.Http.Headers;
+using System.Net;
 
 namespace BarCodeGenerator.Controllers
 {
@@ -13,7 +18,19 @@ namespace BarCodeGenerator.Controllers
         [HttpGet]
         public IEnumerable<string> Get()
         {
-            return new string[] { "value1", "value2" };
+            string imageBase64;
+            Bitmap bitmap = new Bitmap(300, 400, System.Drawing.Imaging.PixelFormat.Format32bppArgb);
+
+            Graphics graphics = Graphics.FromImage(bitmap);
+
+            graphics.FillRectangle(new SolidBrush(Color.Black), new Rectangle(0, 0, 300, 400));
+            using (MemoryStream ms = new MemoryStream())
+            {
+                bitmap.Save(ms, System.Drawing.Imaging.ImageFormat.Png);
+                byte[] _bytes = ms.ToArray();
+                imageBase64 = Convert.ToBase64String(_bytes);
+            }
+            return new string[] { "value1", imageBase64 };
         }
 
         // GET api/values/5
